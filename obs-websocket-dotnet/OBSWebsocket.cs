@@ -1,13 +1,13 @@
-using System;
-using System.Security.Cryptography;
-using System.Text;
-using Newtonsoft.Json.Linq;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using OBSWebsocketDotNet.Communication;
+using System;
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
 using Websocket.Client;
-using OBSWebsocketDotNet.Communication;
 
 namespace OBSWebsocketDotNet
 {
@@ -47,7 +47,7 @@ namespace OBSWebsocketDotNet
                 }
             }
         }
-      
+
         /// <summary>
         /// Current connection state
         /// </summary>
@@ -258,7 +258,7 @@ namespace OBSWebsocketDotNet
             if (!(bool)result["requestStatus"]["result"])
             {
                 var status = (JObject)result["requestStatus"];
-                throw new ErrorResponseException($"ErrorCode: {status["code"]}{(status.ContainsKey("comment") ? $", Comment: {status["comment"]}" : "")}", (int)status["code"]);
+                //throw new ErrorResponseException($"ErrorCode: {status["code"]}{(status.ContainsKey("comment") ? $", Comment: {status["comment"]}" : "")}", (int)status["code"]);
             }
 
             if (result.ContainsKey("responseData")) // ResponseData is optional
@@ -353,6 +353,16 @@ namespace OBSWebsocketDotNet
             SendIdentify(connectionPassword, authInfo);
 
             connectionPassword = null;
+        }
+
+        public void SendReidentify(int eventSubscriptions)
+        {
+            var requestFields = new JObject
+            {
+                { "eventSubscriptions", eventSubscriptions }
+            };
+
+            SendRequest(MessageTypes.ReIdentify, null, requestFields, false);
         }
     }
 }

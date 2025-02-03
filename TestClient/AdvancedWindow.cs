@@ -1,11 +1,11 @@
 ﻿using Newtonsoft.Json.Linq;
 using OBSWebsocketDotNet;
 using OBSWebsocketDotNet.Types;
+using OBSWebsocketDotNet.Types.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
-using OBSWebsocketDotNet.Types.Events;
 
 namespace TestClient
 {
@@ -40,6 +40,8 @@ namespace TestClient
                 return;
             }
 
+            obs.SendReidentify(1 << 16);
+
 
             obs.StreamStateChanged += Obs_StreamStateChanged;
             obs.RecordStateChanged += Obs_RecordStateChanged;
@@ -55,6 +57,7 @@ namespace TestClient
             obs.InputActiveStateChanged += Obs_InputActiveStateChanged;
             obs.InputMuteStateChanged += Obs_InputMuteStateChanged;
             obs.InputVolumeChanged += OBS_onInputVolumeChanged;
+            obs.InputVolumeMeters += Obs_InputVolumeMeters;
 
             obs.ProfileListChanged += Obs_ProfileListChanged;
             obs.ReplayBufferStateChanged += Obs_ReplayBufferStateChanged;
@@ -84,6 +87,25 @@ namespace TestClient
             obs.StudioModeStateChanged += Obs_StudioModeStateChanged;
 
             obs.VirtualcamStateChanged += Obs_VirtualcamStateChanged;
+        }
+
+        private void Obs_InputVolumeMeters(object sender, InputVolumeMetersEventArgs e)
+        {
+            try
+            {
+
+                foreach (var item in e.inputs)
+                {
+                    if (item.ContainsKey("inputName"))
+                    {
+                        if ((string)item["inputName"] != "PROGRAM AUDIO INPUT")
+                            continue;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
         }
 
         private void Obs_InputActiveStateChanged(object sender, InputActiveStateChangedEventArgs args)
